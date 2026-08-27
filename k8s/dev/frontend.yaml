@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: shajedultonmoy/simplechat-ui:dev-9393466
+          image: shajedultonmoy/simplechat-ui:dev-50c5a53
           ports:
             - containerPort: 5173
           env:
