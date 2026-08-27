@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: chat-frontend
+  namespace: prod
   labels:
     app: chat-frontend
     environment: prod
@@ -53,6 +54,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: chat-frontend
+  namespace: prod
   labels:
     app: chat-frontend
     environment: prod
