@@ -29,7 +29,7 @@ spec:
             - name: NODE_ENV
               value: "development"
             - name: CLIENT_URL
-              value: "http://localhost:5173"
+              value: "http://34.238.235.55:30080"
             - name: CHAT_PRIMARY_COLOR
               value: "#2563EB"
             - name: CHAT_SECONDARY_COLOR
@@ -70,7 +70,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
 ---
-# Development Environment - Backend Service
+# Development Environment - Backend Service (NodePort)
 apiVersion: v1
 kind: Service
 metadata:
@@ -86,4 +86,5 @@ spec:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-  type: ClusterIP
+      nodePort: 30081
+  type: NodePort

@@ -25,9 +25,9 @@ spec:
             - containerPort: 80
           env:
             - name: VITE_API_URL
-              value: "http://chat-backend:5000"
+              value: "http://34.238.235.55:30085"
             - name: VITE_SOCKET_URL
-              value: "http://chat-backend:5000"
+              value: "http://34.238.235.55:30085"
           resources:
             requests:
               memory: "64Mi"
@@ -48,7 +48,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
 ---
-# Production Environment - Frontend Service
+# Production Environment - Frontend Service (NodePort)
 apiVersion: v1
 kind: Service
 metadata:
@@ -64,4 +64,5 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-  type: ClusterIP
+      nodePort: 30084
+  type: NodePort
