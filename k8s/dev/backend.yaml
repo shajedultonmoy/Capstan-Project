@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: shajedultonmoy/simplechat-server:dev-0c5f8b6
+          image: shajedultonmoy/simplechat-server:dev-6609697
           ports:
             - containerPort: 5000
           env:
