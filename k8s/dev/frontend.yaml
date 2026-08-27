@@ -21,9 +21,9 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: shajedultonmoy/simplechat-ui:dev-6609697
+          image: shajedultonmoy/simplechat-ui:dev-de2dcc2
           ports:
-            - containerPort: 80
+            - containerPort: 5173
           env:
             - name: VITE_API_URL
               value: "http://34.238.235.55:30081"
@@ -39,13 +39,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 80
+              port: 5173
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /
-              port: 80
+              port: 5173
             initialDelaySeconds: 5
             periodSeconds: 10
 ---
@@ -65,6 +65,6 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 5173
       nodePort: 30080
   type: NodePort

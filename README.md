@@ -138,3 +138,5 @@ Open http://localhost:5173
 
 - [Deployment Decisions](DECISIONS.md)
 - [Server Setup Guide](scripts/setup-server.sh)
+
+- Testing final pipeline deployment
