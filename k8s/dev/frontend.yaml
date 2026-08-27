@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: shajedultonmoy/simplechat-ui:dev-de2dcc2
+          image: shajedultonmoy/simplechat-ui:dev-50c5a53
           ports:
             - containerPort: 5173
           env:
@@ -31,23 +31,25 @@ spec:
               value: "http://34.238.235.55:30081"
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "50m"
-            limits:
-              memory: "128Mi"
+              memory: "256Mi"
               cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "250m"
           livenessProbe:
             httpGet:
               path: /
               port: 5173
-            initialDelaySeconds: 10
+            initialDelaySeconds: 45
             periodSeconds: 30
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /
               port: 5173
-            initialDelaySeconds: 5
+            initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
 ---
 # Development Environment - Frontend Service (NodePort)
 apiVersion: v1
