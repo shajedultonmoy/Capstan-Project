@@ -1,0 +1,45 @@
+name: CD - Deploy to Dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag (commit SHA) to deploy'
+        required: true
+        type: string
+
+env:
+  CLUSTER_NAME: capstan-dev
+  NAMESPACE: dev
+
+jobs:
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set image tags
+        run: |
+          echo "BACKEND_IMAGE=ghcr.io/${{ github.repository_owner }}/chat-backend:dev-${{ inputs.image_tag }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=ghcr.io/${{ github.repository_owner }}/chat-frontend:dev-${{ inputs.image_tag }}" >> $GITHUB_ENV
+
+      - name: Deploy to dev cluster
+        run: |
+          kubectl config use-context ${{ env.CLUSTER_NAME }}
+          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+          # Update image tags in manifests
+          kustomize build k8s/dev/ | \
+            sed "s|IMAGE_PLACEHOLDER_BACKEND|${BACKEND_IMAGE}|g" | \
+            sed "s|IMAGE_PLACEHOLDER_FRONTEND|${FRONTEND_IMAGE}|g" | \
+            kubectl apply -n ${{ env.NAMESPACE }} -f -
+
+          kubectl rollout status deployment/chat-backend -n ${{ env.NAMESPACE }} --timeout=120s
+          kubectl rollout status deployment/chat-frontend -n ${{ env.NAMESPACE }} --timeout=120s
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n ${{ env.NAMESPACE }}
+          kubectl get svc -n ${{ env.NAMESPACE }}

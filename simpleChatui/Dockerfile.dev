@@ -1,0 +1,20 @@
+# Development Dockerfile for frontend
+# Includes debug tools
+FROM node:20-alpine
+
+# Install debug tools for development
+RUN apk add --no-cache curl wget bind-tools net-tools
+
+WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package*.json ./
+RUN npm install
+
+# Copy source files
+COPY . .
+
+EXPOSE 5173
+
+# Use Vite dev server
+CMD ["npm", "run", "dev"]

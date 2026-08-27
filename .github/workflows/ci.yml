@@ -1,0 +1,67 @@
+name: CI - Build & Validate
+
+on:
+  push:
+    branches: [main, dev, stage, prod]
+  pull_request:
+    branches: [main, dev, stage, prod]
+
+jobs:
+  lint-and-typecheck-backend:
+    name: Backend - Lint & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: simpleChatserver/package-lock.json
+      - run: npm ci
+        working-directory: simpleChatserver
+      - run: npm run typecheck
+        working-directory: simpleChatserver
+
+  lint-and-typecheck-frontend:
+    name: Frontend - Lint & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: simpleChatui/package-lock.json
+      - run: npm ci
+        working-directory: simpleChatui
+      - run: npm run lint
+        working-directory: simpleChatui
+      - run: npm run build
+        working-directory: simpleChatui
+
+  build-backend-image:
+    name: Backend - Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - run: |
+          docker build \
+            --label "git-commit=${{ github.sha }}" \
+            --label "git-branch=${{ github.ref_name }}" \
+            --target production \
+            -t chat-backend:${{ github.ref_name }}-${{ github.sha }} \
+            simpleChatserver/
+
+  build-frontend-image:
+    name: Frontend - Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - run: |
+          docker build \
+            --label "git-commit=${{ github.sha }}" \
+            --label "git-branch=${{ github.ref_name }}" \
+            -t chat-frontend:${{ github.ref_name }}-${{ github.sha }} \
+            simpleChatui/

@@ -1,0 +1,21 @@
+# Development Dockerfile for backend
+# Includes debug tools and hot-reload capability
+FROM node:20-alpine
+
+# Install debug tools for development
+RUN apk add --no-cache curl wget bind-tools net-tools
+
+WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package*.json ./
+RUN npm install
+
+# Copy source files
+COPY tsconfig.json ./
+COPY src ./src
+
+EXPOSE 5000
+
+# Use tsx for hot-reload in development
+CMD ["npx", "tsx", "watch", "src/server.ts"]

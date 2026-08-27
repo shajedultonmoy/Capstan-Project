@@ -1,0 +1,54 @@
+name: CD - Deploy to Prod
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [prod]
+
+env:
+  CLUSTER_NAME: capstan-prod
+  NAMESPACE: prod
+
+jobs:
+  deploy-prod:
+    name: Deploy to Production
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: prod
+
+      - name: Get commit SHA
+        id: sha
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Set image tags
+        run: |
+          echo "BACKEND_IMAGE=ghcr.io/${{ github.repository_owner }}/chat-backend:prod-${{ steps.sha.outputs.SHORT_SHA }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=ghcr.io/${{ github.repository_owner }}/chat-frontend:prod-${{ steps.sha.outputs.SHORT_SHA }}" >> $GITHUB_ENV
+
+      - name: Deploy to prod cluster
+        run: |
+          kubectl config use-context ${{ env.CLUSTER_NAME }}
+          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+          # Update image tags in manifests
+          kustomize build k8s/prod/ | \
+            sed "s|IMAGE_PLACEHOLDER_BACKEND|${BACKEND_IMAGE}|g" | \
+            sed "s|IMAGE_PLACEHOLDER_FRONTEND|${FRONTEND_IMAGE}|g" | \
+            kubectl apply -n ${{ env.NAMESPACE }} -f -
+
+          kubectl rollout status deployment/chat-backend -n ${{ env.NAMESPACE }} --timeout=180s
+          kubectl rollout status deployment/chat-frontend -n ${{ env.NAMESPACE }} --timeout=180s
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n ${{ env.NAMESPACE }}
+          kubectl get svc -n ${{ env.NAMESPACE }}
+
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "Prod deployment completed with status: ${{ job.status }}"
