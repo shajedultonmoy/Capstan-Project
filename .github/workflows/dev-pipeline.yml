@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "dev" ]
     paths-ignore:
-      - 'k8s/**' # Prevent infinite loops when the bot commits k8s changes
+      - 'k8s/**'
 
 jobs:
   build-and-update:
