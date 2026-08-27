@@ -40,14 +40,16 @@ spec:
             httpGet:
               path: /
               port: 5173
-            initialDelaySeconds: 10
+            initialDelaySeconds: 45
             periodSeconds: 30
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /
               port: 5173
-            initialDelaySeconds: 5
+            initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
 ---
 # Development Environment - Frontend Service (NodePort)
 apiVersion: v1
