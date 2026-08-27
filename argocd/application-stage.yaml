@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/YOUR_GITHUB_USERNAME/capstan-project.git
+    repoURL: https://github.com/shajedultonmoy/Capstan-Project.git
     targetRevision: stage
     path: k8s/stage
   destination:
